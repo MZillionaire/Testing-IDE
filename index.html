@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Helios - Solar Energy & Home Electricity Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </div>
+      <div>
+        <h1 class="app-title">Helios Energy</h1>
+        <p class="app-subtitle">Smart Home Solar &amp; Grid Electricity Monitor</p>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <span class="status-pill">
+        <span class="status-indicator"></span>
+        Browser Storage Active
+      </span>
+      <button id="btn-demo-data" class="btn btn-secondary" title="Populate realistic sample records">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        Demo Data
+      </button>
+      <button id="btn-open-settings" class="btn btn-secondary" title="Configure Tariffs & System Specs">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Tariff Settings
+      </button>
+      <button id="btn-open-log-modal" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Log Reading
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-wrapper">
+    
+    <!-- Top System Live Flow Card -->
+    <section class="flow-card">
+      <div class="card-header">
+        <div>
+          <h2 class="section-title">Energy Flow Diagram</h2>
+          <p class="section-desc">Real-time dynamic power routing &amp; distribution visualization</p>
+        </div>
+        <div class="flow-control-wrap">
+          <label class="flow-mode-label" for="flow-view-select">Showing:</label>
+          <select id="flow-view-select" class="form-select-sm">
+            <option value="latest">Latest Logged Reading</option>
+            <option value="today">Today's Daily Totals</option>
+            <option value="average">Historical Average</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- Energy Flow Animation Stage -->
+      <div class="flow-stage-container">
+        <canvas id="flow-canvas" width="900" height="280"></canvas>
+      </div>
+
+      <div class="flow-legend">
+        <div class="legend-item"><span class="legend-dot dot-solar"></span> Solar Production</div>
+        <div class="legend-item"><span class="legend-dot dot-home"></span> Home Consumption</div>
+        <div class="legend-item"><span class="legend-dot dot-grid-in"></span> Grid Import</div>
+        <div class="legend-item"><span class="legend-dot dot-grid-out"></span> Grid Feed-in (Export)</div>
+        <div class="legend-item"><span class="legend-dot dot-battery"></span> Battery Flow</div>
+      </div>
+    </section>
+
+    <!-- Key Metrics Grid -->
+    <section class="kpi-grid">
+      <!-- Solar Generated -->
+      <div class="kpi-card kpi-solar">
+        <div class="kpi-icon-wrap">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#f59e0b" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-label">Solar Generated</span>
+          <div class="kpi-value-row">
+            <span id="kpi-solar-val" class="kpi-value">0.0</span>
+            <span class="kpi-unit">kWh</span>
+          </div>
+          <span id="kpi-solar-sub" class="kpi-trend">Total period generation</span>
+        </div>
+      </div>
+
+      <!-- Home Consumption -->
+      <div class="kpi-card kpi-home">
+        <div class="kpi-icon-wrap">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#0ea5e9" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-label">Home Usage</span>
+          <div class="kpi-value-row">
+            <span id="kpi-home-val" class="kpi-value">0.0</span>
+            <span class="kpi-unit">kWh</span>
+          </div>
+          <span id="kpi-home-sub" class="kpi-trend">Total energy consumed</span>
+        </div>
+      </div>
+
+      <!-- Grid Export -->
+      <div class="kpi-card kpi-export">
+        <div class="kpi-icon-wrap">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#10b981" stroke-width="2">
+            <line x1="7" y1="17" x2="17" y2="7"></line>
+            <polyline points="7 7 17 7 17 17"></polyline>
+          </svg>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-label">Grid Feed-in (Export)</span>
+          <div class="kpi-value-row">
+            <span id="kpi-export-val" class="kpi-value">0.0</span>
+            <span class="kpi-unit">kWh</span>
+          </div>
+          <span id="kpi-export-earnings" class="kpi-trend text-green">+ $0.00 earned</span>
+        </div>
+      </div>
+
+      <!-- Grid Import -->
+      <div class="kpi-card kpi-import">
+        <div class="kpi-icon-wrap">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#f43f5e" stroke-width="2">
+            <line x1="17" y1="7" x2="7" y2="17"></line>
+            <polyline points="17 17 7 17 7 7"></polyline>
+          </svg>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-label">Grid Import</span>
+          <div class="kpi-value-row">
+            <span id="kpi-import-val" class="kpi-value">0.0</span>
+            <span class="kpi-unit">kWh</span>
+          </div>
+          <span id="kpi-import-cost" class="kpi-trend text-rose">- $0.00 cost</span>
+        </div>
+      </div>
+
+      <!-- Self Sufficiency -->
+      <div class="kpi-card kpi-autarky">
+        <div class="kpi-icon-wrap">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#8b5cf6" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-label">Self-Sufficiency</span>
+          <div class="kpi-value-row">
+            <span id="kpi-autarky-val" class="kpi-value">0</span>
+            <span class="kpi-unit">%</span>
+          </div>
+          <span id="kpi-autarky-sub" class="kpi-trend">Solar powered share</span>
+        </div>
+      </div>
+
+      <!-- Net Financial Benefit -->
+      <div class="kpi-card kpi-savings">
+        <div class="kpi-icon-wrap">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#10b981" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-label">Net Bill Savings</span>
+          <div class="kpi-value-row">
+            <span id="kpi-savings-val" class="kpi-value">$0.00</span>
+          </div>
+          <span id="kpi-carbon-val" class="kpi-trend text-muted">0 kg CO₂ saved</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Analytics & Charts Grid -->
+    <section class="charts-grid">
+      <!-- Main Trend Bar Chart -->
+      <div class="chart-card chart-main">
+        <div class="card-header">
+          <div>
+            <h2 class="section-title">Energy Dynamics Over Time</h2>
+            <p class="section-desc">Solar Production vs Household Consumption vs Grid Exchange</p>
+          </div>
+          <div class="chart-actions">
+            <div class="toggle-group" id="time-filter-group">
+              <button class="toggle-btn active" data-range="7">7 Days</button>
+              <button class="toggle-btn" data-range="14">14 Days</button>
+              <button class="toggle-btn" data-range="30">30 Days</button>
+              <button class="toggle-btn" data-range="all">All</button>
+            </div>
+          </div>
+        </div>
+        <div class="canvas-wrapper">
+          <canvas id="trend-chart" width="800" height="320"></canvas>
+          <div id="chart-tooltip" class="custom-tooltip"></div>
+        </div>
+        <div class="chart-legend">
+          <span class="legend-badge"><span class="badge-square bg-solar"></span> Solar Generation</span>
+          <span class="legend-badge"><span class="badge-square bg-home"></span> Home Consumption</span>
+          <span class="legend-badge"><span class="badge-square bg-export"></span> Feed-in Export</span>
+          <span class="legend-badge"><span class="badge-square bg-import"></span> Grid Import</span>
+        </div>
+      </div>
+
+      <!-- Self-Consumption & Energy Partition Donut -->
+      <div class="chart-card chart-donut">
+        <div class="card-header">
+          <div>
+            <h2 class="section-title">Energy Partition</h2>
+            <p class="section-desc">Where your solar goes &amp; power origin</p>
+          </div>
+        </div>
+        <div class="canvas-donut-wrapper">
+          <canvas id="donut-chart" width="280" height="280"></canvas>
+        </div>
+        <div id="donut-breakdown" class="donut-breakdown-list">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Log Entries Table & Management -->
+    <section class="table-card">
+      <div class="card-header">
+        <div>
+          <h2 class="section-title">Energy Logs &amp; Meter Readings</h2>
+          <p class="section-desc">Chronological electricity records saved directly to browser storage</p>
+        </div>
+        <div class="table-actions">
+          <input type="text" id="table-search" class="form-input-sm" placeholder="Search date / weather / notes...">
+          <button id="btn-export-csv" class="btn btn-secondary btn-sm" title="Download CSV">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export CSV
+          </button>
+          <button id="btn-export-json" class="btn btn-secondary btn-sm" title="Backup JSON">
+            Export JSON
+          </button>
+          <label class="btn btn-secondary btn-sm file-input-label">
+            Import JSON
+            <input type="file" id="file-import-json" accept=".json" style="display: none;">
+          </label>
+          <button id="btn-clear-all" class="btn btn-danger btn-sm" title="Clear all records">
+            Clear All
+          </button>
+        </div>
+      </div>
+
+      <!-- Table Container -->
+      <div class="table-responsive">
+        <table class="data-table" id="readings-table">
+          <thead>
+            <tr>
+              <th data-sort="date">Date &amp; Time <span class="sort-icon">&#8597;</span></th>
+              <th>Weather</th>
+              <th data-sort="solar">Solar (kWh) <span class="sort-icon">&#8597;</span></th>
+              <th data-sort="consumption">Home (kWh) <span class="sort-icon">&#8597;</span></th>
+              <th data-sort="export">Export (kWh) <span class="sort-icon">&#8597;</span></th>
+              <th data-sort="import">Import (kWh) <span class="sort-icon">&#8597;</span></th>
+              <th>Self-Use %</th>
+              <th>Net Financial</th>
+              <th>Notes</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="readings-table-body">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div id="table-empty-state" class="empty-state hidden">
+        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#64748b" stroke-width="1.5">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+        </svg>
+        <p class="empty-title">No energy readings found</p>
+        <p class="empty-desc">Click "Log Reading" above or load demo data to view solar analytics.</p>
+        <button id="btn-empty-load-demo" class="btn btn-primary btn-sm mt-12">Load Sample Data</button>
+      </div>
+
+      <div class="table-footer">
+        <span id="table-count-label" class="table-count">Showing 0 entries</span>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal: Log / Edit Reading -->
+  <div id="reading-modal" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-heading" class="modal-title">Log Electricity Reading</h3>
+        <button class="modal-close" id="btn-modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <form id="reading-form" class="modal-body">
+        <input type="hidden" id="entry-id" value="">
+
+        <div class="form-row">
+          <div class="form-group form-col">
+            <label for="input-date">Date <span class="req">*</span></label>
+            <input type="date" id="input-date" class="form-input" required>
+          </div>
+          <div class="form-group form-col">
+            <label for="input-weather">Sky / Weather</label>
+            <select id="input-weather" class="form-input">
+              <option value="sunny">☀️ Full Sun</option>
+              <option value="partly-cloudy">⛅ Partly Cloudy</option>
+              <option value="cloudy">☁️ Overcast</option>
+              <option value="rainy">🌧️ Rain / Storm</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-section-title">Energy Totals (kWh)</div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="input-solar">Solar Generation (kWh) <span class="req">*</span></label>
+            <input type="number" step="0.01" min="0" id="input-solar" class="form-input" placeholder="e.g. 28.5" required>
+            <span class="form-hint">Total generated by solar panels</span>
+          </div>
+          <div class="form-group">
+            <label for="input-consumption">Home Consumption (kWh) <span class="req">*</span></label>
+            <input type="number" step="0.01" min="0" id="input-consumption" class="form-input" placeholder="e.g. 18.2" required>
+            <span class="form-hint">Total electricity used by home</span>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="input-export">Grid Feed-in / Export (kWh)</label>
+            <input type="number" step="0.01" min="0" id="input-export" class="form-input" placeholder="e.g. 14.1" value="0">
+            <span class="form-hint">Surplus solar pushed to the grid</span>
+          </div>
+          <div class="form-group">
+            <label for="input-import">Grid Import (kWh)</label>
+            <input type="number" step="0.01" min="0" id="input-import" class="form-input" placeholder="e.g. 3.8" value="0">
+            <span class="form-hint">Power drawn from utility grid</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group form-col">
+            <label for="input-battery">Battery State / Net Storage (kWh)</label>
+            <input type="number" step="0.01" id="input-battery" class="form-input" placeholder="e.g. +2.5 (charge) or -3.1 (discharge)" value="0">
+            <span class="form-hint">Optional: (+) charged into battery, (-) drawn from battery</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="input-notes">Notes / Observations</label>
+          <input type="text" id="input-notes" class="form-input" placeholder="e.g. Ran EV charger & heat pump at noon">
+        </div>
+
+        <!-- Calculated Preview inside form -->
+        <div class="form-calc-preview" id="form-calc-preview">
+          <div class="preview-metric">
+            <span class="preview-label">Calculated Self-Use:</span>
+            <span class="preview-val" id="preview-self-use">0.0 kWh (0%)</span>
+          </div>
+          <div class="preview-metric">
+            <span class="preview-label">Estimated Day Savings:</span>
+            <span class="preview-val text-green" id="preview-savings">$0.00</span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-modal-save">Save Reading</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Settings (Tariffs & Specs) -->
+  <div id="settings-modal" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Tariff &amp; System Configuration</h3>
+        <button class="modal-close" id="btn-settings-close" aria-label="Close modal">&times;</button>
+      </div>
+      <form id="settings-form" class="modal-body">
+        <div class="form-section-title">Electricity Pricing &amp; Currency</div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="setting-currency">Currency Symbol</label>
+            <input type="text" id="setting-currency" class="form-input" maxlength="4" value="$" required>
+            <span class="form-hint">e.g. $, €, £, A$, ¥</span>
+          </div>
+          <div class="form-group">
+            <label for="setting-import-rate">Grid Import Price (per kWh)</label>
+            <input type="number" step="0.001" min="0" id="setting-import-rate" class="form-input" value="0.28" required>
+            <span class="form-hint">Cost to buy electricity from grid</span>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="setting-export-rate">Feed-in Tariff (per kWh)</label>
+            <input type="number" step="0.001" min="0" id="setting-export-rate" class="form-input" value="0.08" required>
+            <span class="form-hint">Payment received for solar export</span>
+          </div>
+          <div class="form-group">
+            <label for="setting-co2-factor">Grid Emission Factor (kg CO₂/kWh)</label>
+            <input type="number" step="0.01" min="0" id="setting-co2-factor" class="form-input" value="0.45" required>
+            <span class="form-hint">Average regional grid carbon intensity</span>
+          </div>
+        </div>
+
+        <div class="form-section-title">Solar &amp; Battery Hardware Specifications</div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="setting-system-size">Solar System Capacity (kWp)</label>
+            <input type="number" step="0.1" min="0" id="setting-system-size" class="form-input" value="6.5">
+            <span class="form-hint">Rated peak panel capacity</span>
+          </div>
+          <div class="form-group">
+            <label for="setting-battery-cap">Home Battery Capacity (kWh)</label>
+            <input type="number" step="0.1" min="0" id="setting-battery-cap" class="form-input" value="10.0">
+            <span class="form-hint">Total installed battery capacity</span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-settings-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Settings</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
+
